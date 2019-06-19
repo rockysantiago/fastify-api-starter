@@ -1,25 +1,17 @@
-import fastify from 'fastify';
 import fastifySwagger from 'fastify-swagger';
-import mongoose from 'mongoose';
+import gql from 'fastify-gql';
 
+import app from './app';
 import routes from './routes';
+import schema from './schema';
 import swagger from './config/swagger';
-
-const app = fastify({ logger: true });
 
 app.register(fastifySwagger, swagger);
 
-const run = async () => {
-  try {
-    await mongoose.connect('mongodb://localhost/mycargarage', {
-      useNewUrlParser: true
-    });
-    app.log.info('MongoDB connected…');
-  } catch (err) {
-    app.log.error(err);
-  }
-};
-run();
+app.register(gql, {
+  schema,
+  graphiql: true
+});
 
 routes.forEach((route, index) => {
   app.route(route);
