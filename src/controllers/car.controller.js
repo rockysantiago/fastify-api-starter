@@ -13,7 +13,7 @@ const getCars = async (req, reply) => {
 
 const getSingleCar = async (req, reply) => {
   try {
-    const id = req.params.id;
+    const id = req.params === undefined ? req.id : req.params.id;
     const car = await Car.findById(id);
     return car;
   } catch (err) {
@@ -23,8 +23,9 @@ const getSingleCar = async (req, reply) => {
 
 const addCar = async (req, reply) => {
   try {
-    const car = new Car(req.body);
-    return car.save();
+    const car = new Car(req);
+    const newCar = await car.save();
+    return newCar;
   } catch (err) {
     throw boom.boomify(err);
   }
@@ -32,9 +33,8 @@ const addCar = async (req, reply) => {
 
 const updateCar = async (req, reply) => {
   try {
-    const id = req.params.id;
-    const car = req.body;
-    const { ...updateData } = car;
+    const id = req.params === undefined ? req.id : req.params.id;
+    const updateData = req.params === undefined ? req : req.params;
     const update = await Car.findByIdAndUpdate(id, updateData, { new: true });
     return update;
   } catch (err) {
@@ -44,7 +44,7 @@ const updateCar = async (req, reply) => {
 
 const deleteCar = async (req, reply) => {
   try {
-    const id = req.params.id;
+    const id = req.params === undefined ? req.id : req.params.id;
     const car = await Car.findByIdAndRemove(id);
     return car;
   } catch (err) {
